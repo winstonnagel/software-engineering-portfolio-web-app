@@ -4,6 +4,8 @@ import './App.css';
 import Chart from 'chart.js/auto';
 import axios from 'axios';
 import 'chartjs-adapter-date-fns';
+import FinanceDefinitions from './financedefinitions.js'; // Import the FinanceDefinitions component
+
 
 function App() {
   const [tickers, setTickers] = useState('');
@@ -44,22 +46,25 @@ function App() {
 
     if (showGraph) {
       const ctx = document.getElementById('combinedStockGraph');
-      ctx.width = 600;
-      ctx.height = 300;
+      ctx.width = 700;
+      ctx.height = 400;
 
       const datasets = stockData.map((stock, index) => ({
-        label: stock.ticker,
+        label: stock.ticker || 'S&P 500',
         data: stock.data.map(data => ({ x: data.date, y: data.close })),
         borderColor: colors[index % colors.length],
         borderWidth: 2,
         fill: false
       }));
 
+
+
+
       const combinedChart = new Chart(ctx, {
         type: 'line',
         data: {
-          labels: stockData[0] ? stockData[0].data.map(data => data.date) : [],
-          datasets: datasets
+            labels: stockData[0] ? stockData[0].data.map(data => data.date) : [],
+            datasets: datasets
         },
         options: {
           scales: {
@@ -79,7 +84,10 @@ function App() {
 
       chartRef.current = combinedChart;
     }
-  }, [stockData]);
+  }, [stockData, showGraph, spMetrics]);
+
+  const [showDefinitions, setShowDefinitions] = useState(false);
+
 
 
   const formatValue = (value) => {
@@ -103,15 +111,15 @@ function App() {
 
   const getpercentageColor = (value) => {
     if (value < 0) {
-      return { color: 'red' };
-
-    } else {
-      if (value > 0) {
-        return { color: 'rgb(0, 255, 44)' };
-      }
+      return 'red';
+    } else if (value > 0) {
+      return 'rgb(0, 255, 44)';
     }
-    return {};
+    return 'inherit';
   }
+
+  const [showLearnMore, setShowLearnMore] = useState(false);
+
 
   const formatMarketCap = (marketcap) => formatValue(marketcap);
   const formatRevenue = (revenue) => formatValue(revenue);
@@ -123,8 +131,11 @@ function App() {
       console.warn(`No valid data found for key: ${key}`);
       return "N/A"; // Return a placeholder if there's no valid data
     }
-
+    const averagemaxChangePercent = computeAverage(stockMetrics.map(stock => parseFloat(stock.metrics.maxChangePercent)));
+    const averageYear5ChangePercent = computeAverage(stockMetrics.map(stock => parseFloat(stock.metrics.year5ChangePercent)));
     const averageYear1ChangePercent = computeAverage(stockMetrics.map(stock => parseFloat(stock.metrics.year1ChangePercent)));
+    const averageMonth6ChangePercent = computeAverage(stockMetrics.map(stock => parseFloat(stock.metrics.month6ChangePercent)));
+    const averageDay5ChangePercent = computeAverage(stockMetrics.map(stock => parseFloat(stock.metrics.day5ChangePercent)));
 
 
     const averageValue = (validData.reduce((acc, val) => acc + parseFloat(val), 0) / validData.length).toFixed(2);
@@ -137,12 +148,7 @@ function App() {
     }
   };
 
-  const calculatePercentageIncrease = (currentPrice, price52WeeksAgo) => {
-    if (price52WeeksAgo === 0) {
-      return "N/A";  // or any other default value
-    }
-    return ((currentPrice - price52WeeksAgo) / price52WeeksAgo) * 100;
-  };
+
 
   const calculateStartDate = (years) => {
     const currentDate = new Date();
@@ -151,7 +157,6 @@ function App() {
   };
 
   const fetchStockData = async (tickers, years) => {
-    const startDate = calculateStartDate(years);
 
     const tickerList = tickers.split(',').map(ticker => ticker.trim());
 
@@ -176,7 +181,8 @@ function App() {
     const fetchSp500Metrics = async () => {
       try {
           const response = await axios.get(`https://cloud.iexapis.com/stable/stock/SPY/advanced-stats?token=sk_81a9304d8942465cb4e738fca8f2d375`);
-          return response.data; // Assuming the response directly contains the S&P 500 metrics
+          return response.data;
+
       } catch (error) {
           console.error('Error fetching S&P 500 metrics:', error);
           return null;
@@ -206,7 +212,12 @@ function App() {
                     price52WeeksAgo,
                     profitMargin: parseFloat(response.data.profitMargin).toFixed(2),
                     revenue: parseFloat(response.data.revenue).toFixed(2),
-                    year1ChangePercent: parseFloat(response.data.year1ChangePercent * 100).toFixed(2) // Add this line to fetch the year1ChangePercent
+                    maxChangePercent: parseFloat(response.data.maxChangePercent * 100).toFixed(2),
+                    year5ChangePercent: parseFloat(response.data.year5ChangePercent * 100).toFixed(2),
+                    year1ChangePercent: parseFloat(response.data.year1ChangePercent * 100).toFixed(2),
+                    month6ChangePercent: parseFloat(response.data.month6ChangePercent * 100).toFixed(2),
+                    day5ChangePercent: parseFloat(response.data.day5ChangePercent * 100).toFixed(2),
+
                   },
                 sector: sectorResponse.data.sector
             };
@@ -238,14 +249,26 @@ function App() {
   const handleSubmit = (event) => {
     event.preventDefault();
     fetchStockData(tickers);
+    setShowLearnMore(true);
     setShowGraph(true);  // Set showGraph to true after fetching data
+
   };
   const handleLogin = () => {
     // Logic for handling login
     console.log('Login clicked');
+    setShowDefinitions(true);
   };
 
+  const handleCloseDefinitions = () => {
+    setShowDefinitions(false);
+};
+
+  const averagemaxChangePercent = computeAverage(stockMetrics, 'maxChangePercent');
+  const averageYear5ChangePercent = computeAverage(stockMetrics, 'year5ChangePercent');
   const averageYear1ChangePercent = computeAverage(stockMetrics, 'year1ChangePercent');
+  const averageMonth6ChangePercent = computeAverage(stockMetrics, 'month6ChangePercent');
+  const averageDay5ChangePercent = computeAverage(stockMetrics, 'day5ChangePercent');
+
 
 
 
@@ -254,7 +277,7 @@ function App() {
       <header className="App-header">
         <div className="header-content">
           <div className="header-buttons">
-            <button className="big-button">Learn About Finance</button>
+          <button className="big-button" onClick={handleLogin}>Learn About Finance</button>
             <button className="big-button">Pricing</button>
             <button className="big-button">Login</button>
           </div>
@@ -267,9 +290,10 @@ function App() {
               onChange={handleInputChange}
               style={{ fontSize: '14px' }}
             />
-            <button type="submit" onClick={handleSubmit}>Fetch Data</button>
+            <button type="submit" onClick={handleSubmit} style={{ fontSize: '1.5em', padding: '10px 20px' }}>Show stocks</button>
           </div>
         </div>
+        {showDefinitions && <FinanceDefinitions onClose={handleCloseDefinitions} />}
 
         {stockMetrics.length > 0 && (
     <div className="metrics-section">
@@ -278,15 +302,20 @@ function App() {
         <thead>
           <tr>
               <th>Ticker</th>
+              <th>Sector</th>
               <th>Market Cap</th>
               <th>PE Ratio</th>
               <th>Beta</th>
-              <th>Sector</th>
               <th>Dividend Yield</th>
               <th>EPS (TTM)</th>
               <th>Profit Margin</th>
               <th>Revenue</th>
-              <th>1-Year Price Increase (%)</th> {/* New column header */}
+              <th>Max Change (%)</th>
+              <th>5-Year Change (%)</th>
+              <th>1-Year Price Increase (%)</th>
+              <th>6-Month Change (%)</th>
+              <th>5-Day Change (%)</th>
+
 
           </tr>
 
@@ -297,31 +326,41 @@ function App() {
         <>
             <tr key={index} style={{ backgroundColor: 'transparent' }}>
                 <td>{stock.ticker}</td>
+                <td>{stock.sector}</td>
                 <td>{formatMarketCap(stock.metrics.marketcap)}</td>
                 <td>{stock.metrics.peRatio}</td>
                 <td style={getBetaColor(stock.metrics.beta)}>{stock.metrics.beta}</td>
-                <td>{stock.sector}</td>
                 <td>{stock.metrics.dividendYield === "0.00" ? "0" : `${stock.metrics.dividendYield}%`}</td>
                 <td>{stock.metrics.ttmEPS}</td>
                 <td>{stock.metrics.profitMargin}</td>
                 <td>{formatRevenue(stock.metrics.revenue)}</td>
-                <td style={{ color: getpercentageColor(stock.metrics.year1ChangePercent) }}>{stock.metrics.year1ChangePercent === "N/A" ? "N/A" : `${stock.metrics.year1ChangePercent}%`}
-                </td>
+                <td style={{ color: getpercentageColor(stock.metrics.maxChangePercent) }}>{stock.metrics.maxChangePercent === "N/A" ? "N/A" : `${stock.metrics.maxChangePercent}%`}</td>
+                <td style={{ color: getpercentageColor(stock.metrics.year5ChangePercent) }}>{stock.metrics.year5ChangePercent === "N/A" ? "N/A" : `${stock.metrics.year5ChangePercent}%`}</td>
+                <td style={{ color: getpercentageColor(stock.metrics.year1ChangePercent) }}>{stock.metrics.year1ChangePercent === "N/A" ? "N/A" : `${stock.metrics.year1ChangePercent}%`}</td>
+                <td style={{ color: getpercentageColor(stock.metrics.month6ChangePercent) }}>{stock.metrics.month6ChangePercent === "N/A" ? "N/A" : `${stock.metrics.month6ChangePercent}%`}</td>
+                <td style={{ color: getpercentageColor(stock.metrics.day5ChangePercent) }}>{stock.metrics.day5ChangePercent === "N/A" ? "N/A" : `${stock.metrics.day5ChangePercent}%`}</td>
+
                 </tr>
-            {index < stockMetrics.length - 1 && <tr className="separator-row"><td colSpan="10"></td></tr>}
+            {index < stockMetrics.length - 1 && <tr className="separator-row"><td colSpan="14"></td></tr>}
         </>
     ))}
 <tr className="average-row">
     <td>Averages</td>
+    <td>-</td>
     <td>{formatMarketCap(parseFloat(computeAverage(stockMetrics, 'marketcap')))}</td>
     <td>{computeAverage(stockMetrics, 'peRatio')}</td>
-    <td>{computeAverage(stockMetrics, 'beta')}</td>
-    <td>-</td>
+    <td style={{ color: getpercentageColor(computeAverage(stockMetrics, 'beta')) }}>{computeAverage(stockMetrics, 'beta')}</td>
     <td>{computeAverage(stockMetrics, 'dividendYield')}</td>
     <td>{computeAverage(stockMetrics, 'ttmEPS')}</td>
     <td>{computeAverage(stockMetrics, 'profitMargin')}</td>
     <td>{formatRevenue(computeAverage(stockMetrics, 'revenue'))}</td>
-    <td>{averageYear1ChangePercent === "N/A" ? "N/A" : `${averageYear1ChangePercent}%`}</td> {/* Display the average 1-year price increase percentage */}
+    <td style={{ color: getpercentageColor(averagemaxChangePercent) }}>{averagemaxChangePercent === "N/A" ? "N/A" : `${averagemaxChangePercent}%`}</td>
+    <td style={{ color: getpercentageColor(averageYear5ChangePercent) }}>{averageYear5ChangePercent === "N/A" ? "N/A" : `${averageYear5ChangePercent}%`}</td>
+    <td style={{ color: getpercentageColor(averageYear1ChangePercent) }}>{averageYear1ChangePercent === "N/A" ? "N/A" : `${averageYear1ChangePercent}%`}</td>
+    <td style={{ color: getpercentageColor(averageMonth6ChangePercent) }}>{averageMonth6ChangePercent === "N/A" ? "N/A" : `${averageMonth6ChangePercent}%`}</td>
+    <td style={{ color: getpercentageColor(averageDay5ChangePercent) }}>{averageDay5ChangePercent === "N/A" ? "N/A" : `${averageDay5ChangePercent}%`}</td>
+
+
 </tr>
 {spMetrics && (
     <tr className="sp500-row">
@@ -334,8 +373,12 @@ function App() {
         <td>-</td>
         <td>-</td>
         <td>-</td>
+        <td style={{ color: getpercentageColor(spMetrics && spMetrics.maxChangePercent) }}>{spMetrics && spMetrics.maxChangePercent ? `${(spMetrics.maxChangePercent * 100).toFixed(2)}%` : "N/A"}</td>
+        <td style={{ color: getpercentageColor(spMetrics && spMetrics.year5ChangePercent) }}>{spMetrics && spMetrics.year5ChangePercent ? `${(spMetrics.year5ChangePercent * 100).toFixed(2)}%` : "N/A"}</td>
+        <td style={{ color: getpercentageColor(spMetrics && spMetrics.year1ChangePercent) }}>{spMetrics && spMetrics.year1ChangePercent ? `${(spMetrics.year1ChangePercent * 100).toFixed(2)}%` : "N/A"}</td>
+        <td style={{ color: getpercentageColor(spMetrics && spMetrics.month6ChangePercent) }}>{spMetrics && spMetrics.month6ChangePercent ? `${(spMetrics.month6ChangePercent * 100).toFixed(2)}%` : "N/A"}</td>
+        <td style={{ color: getpercentageColor(spMetrics && spMetrics.day5ChangePercent) }}>{spMetrics && spMetrics.day5ChangePercent ? `${(spMetrics.day5ChangePercent * 100).toFixed(2)}%` : "N/A"}</td>
 
-        <td>{spMetrics && spMetrics.year1ChangePercent ? `${(spMetrics.year1ChangePercent * 100).toFixed(2)}%` : "N/A"}</td>
 
 </tr>
 )}
@@ -343,20 +386,31 @@ function App() {
 </table>
 </div>
         )}
-{tickerError && <div className="error-message">{tickerError}</div>}
 
-        {showGraph && (
-          <div className="graphs-container">
-            <div className="stock-graph">
-              <h3>{tickers.split(',').length === 1 ? 'Stock Chart' : 'Combined Stock Chart'}</h3>
-              <canvas
-                id="combinedStockGraph"
-                width="1200"
-                height="800"
-              ></canvas>
-            </div>
-          </div>
-        )}
+{showLearnMore && (
+        <li style={{ listStyleType: 'none', fontSize: '1.5em', marginTop: '20px' }}>
+          To learn more about the financial metrics above, please click the<span style={{ textDecoration: 'underline', fontWeight: 'bold' }}>Learn About Finance</span> Button.
+        </li>
+      )}
+
+
+{showGraph && (
+  <div className="graphs-container">
+    <div className="stock-graph">
+      <h3>{tickers.split(',').length === 1 ? 'Stock Chart' : 'Combined Stock Chart'}</h3>
+      <canvas
+        id="combinedStockGraph"
+        width="3500"   // Adjusted width for a bigger chart
+        height="3000"  // Adjusted height for a bigger chart
+      ></canvas>
+    </div>
+  </div>
+)}
+{error && (
+  <div className="error-message">
+    <p>{error}</p>
+  </div>
+)}
       </header>
     </div>
   );

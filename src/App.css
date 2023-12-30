@@ -106,7 +106,7 @@ form {
 .graph-wrapper canvas {
   width: 100%;
   height: auto;
-  max-width: 800px; /* Set max-width to maintain aspect ratio */
+  max-width: 1000px;
 }
 
 .average-row {
@@ -119,4 +119,8 @@ form {
   background-color: white;
   color: black;
   font-weight: bold;
+}
+
+.separator-row td {
+  border-bottom: 1px solid white; /* This will create a line below each table cell */
 }

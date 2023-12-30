@@ -1,0 +1,14 @@
+.definitions-modal {
+  text-align: left;
+  padding: 20px;
+  font-size: 20px;
+}
+
+.definitions-list {
+  list-style-type: none;
+  padding: 0;
+}
+
+.definitions-list li {
+  margin-bottom: 15px;
+}
