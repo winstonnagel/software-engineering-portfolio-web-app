@@ -88,25 +88,35 @@ form {
 }
 
 .App-logo-container {
-  width: 600px;  /* Adjust as needed */
-  height: 300px; /* Adjust as needed */
+  width: 800px;  /* Adjust as needed */
+  height: 500px; /* Adjust as needed */
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
 .graph-wrapper {
-  width: calc(33.33% - 20px); /* Adjust based on the width and gap */
+  width: calc(100% - 40px); /* Adjust based on the width and gap */
   box-sizing: border-box;
   padding: 10px;
   border: 1px solid #ccc;
   text-align: center;
+  font-size: 5.5em;
 }
 
 .graph-wrapper canvas {
   width: 100%;
   height: auto;
-  max-width: 1000px;
+  max-width: 1500px;
+}
+
+.graph-wrapper .ticker-class {
+  font-size: 5.5em; /* Adjust font size for tickers */
+}
+
+/* Alternatively, if you want to target the tickers that appear above the chart more precisely */
+.graph-wrapper .ticker-above {
+  font-size: 5.5em; /* Adjust font size for these specific tickers */
 }
 
 .average-row {

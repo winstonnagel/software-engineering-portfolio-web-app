@@ -18,6 +18,8 @@ function App() {
   const chartTitle = tickers.split(',').length === 1 ? 'Stock Chart' : 'Combined Stock Chart';
   const [spMetrics, setSpMetrics] = useState(null);
   const [tickerError, setTickerError] = useState(null);
+  const [legendFontSize, setLegendFontSize] = useState(30); // Default font size set to 14
+
 
 
 
@@ -46,8 +48,8 @@ function App() {
 
     if (showGraph) {
       const ctx = document.getElementById('combinedStockGraph');
-      ctx.width = 700;
-      ctx.height = 400;
+      ctx.width = 1500;
+      ctx.height = 900;
 
       const datasets = stockData.map((stock, index) => ({
         label: stock.ticker || 'S&P 500',
@@ -63,10 +65,17 @@ function App() {
       const combinedChart = new Chart(ctx, {
         type: 'line',
         data: {
-            labels: stockData[0] ? stockData[0].data.map(data => data.date) : [],
-            datasets: datasets
+          labels: stockData[0] ? stockData[0].data.map(data => data.date) : [],
+          datasets: datasets
         },
         options: {
+          plugins: {
+            legend: {
+              labels: {
+                fontSize: legendFontSize // Set the font size for the legend labels
+              }
+            }
+          },
           scales: {
             x: {
               type: 'time',
@@ -81,6 +90,7 @@ function App() {
           }
         }
       });
+
 
       chartRef.current = combinedChart;
     }
@@ -150,11 +160,7 @@ function App() {
 
 
 
-  const calculateStartDate = (years) => {
-    const currentDate = new Date();
-    const startDate = new Date(currentDate.getFullYear() - years, currentDate.getMonth(), currentDate.getDate());
-    return `${startDate.getFullYear()}-01-01`; // Format to "YYYY-01-01" to ensure the data starts from January 1st of that year
-  };
+
 
   const fetchStockData = async (tickers, years) => {
 
@@ -162,7 +168,7 @@ function App() {
 
     const fetchDataPromises = tickerList.map(async (ticker) => {
         try {
-            const response = await axios.get(`https://cloud.iexapis.com/stable/stock/${ticker}/chart/1y?range=10y&token=sk_81a9304d8942465cb4e738fca8f2d375`);
+            const response = await axios.get(`https://cloud.iexapis.com/stable/stock/${ticker}/chart/1y?range=10y&token=sk_399e63b2a3354cb0ba768c04cbe7ad92`);
             const dataSinceStartDate = response.data.map(data => ({
                 date: data.date,
                 close: data.close
@@ -180,7 +186,7 @@ function App() {
 
     const fetchSp500Metrics = async () => {
       try {
-          const response = await axios.get(`https://cloud.iexapis.com/stable/stock/SPY/advanced-stats?token=sk_81a9304d8942465cb4e738fca8f2d375`);
+          const response = await axios.get(`https://cloud.iexapis.com/stable/stock/SPY/advanced-stats?token=sk_399e63b2a3354cb0ba768c04cbe7ad92`);
           return response.data;
 
       } catch (error) {
@@ -191,9 +197,9 @@ function App() {
 
     const fetchMetricsPromises = tickerList.map(async (ticker) => {
         try {
-          const response = await axios.get(`https://cloud.iexapis.com/stable/stock/${ticker}/advanced-stats?token=sk_81a9304d8942465cb4e738fca8f2d375`);
-          const sectorResponse = await axios.get(`https://cloud.iexapis.com/stable/stock/${ticker}/company?token=sk_81a9304d8942465cb4e738fca8f2d375`);
-            const chartDataResponse = await axios.get(`https://cloud.iexapis.com/stable/stock/${ticker}/chart/1y?token=sk_81a9304d8942465cb4e738fca8f2d375`);
+          const response = await axios.get(`https://cloud.iexapis.com/stable/stock/${ticker}/advanced-stats?token=sk_399e63b2a3354cb0ba768c04cbe7ad92`);
+          const sectorResponse = await axios.get(`https://cloud.iexapis.com/stable/stock/${ticker}/company?token=sk_399e63b2a3354cb0ba768c04cbe7ad92`);
+            const chartDataResponse = await axios.get(`https://cloud.iexapis.com/stable/stock/${ticker}/chart/1y?token=sk_399e63b2a3354cb0ba768c04cbe7ad92`);
 
             const price52WeeksAgo = chartDataResponse.data[response.data.length - 52]?.close || 0;
             const epsValue = response.data.ttmEPS;
@@ -243,6 +249,8 @@ function App() {
 
   const handleInputChange = (event) => {
     setTickers(event.target.value.toUpperCase());
+    const inputFontSize = 40; // Set the desired font size for the legend
+    setLegendFontSize(inputFontSize);
     setError('');
   };
 
@@ -279,6 +287,7 @@ function App() {
           <div className="header-buttons">
           <button className="big-button" onClick={handleLogin}>Learn About Finance</button>
             <button className="big-button">Pricing</button>
+            <button className="big-button">PortfolioPro</button>
             <button className="big-button">Login</button>
           </div>
           <img src={logo} className="App-logo" alt="logo" />
@@ -297,7 +306,7 @@ function App() {
 
         {stockMetrics.length > 0 && (
     <div className="metrics-section">
-        <h2>Financial Metrics</h2>
+        <h2>Your Portfolio's Financial Metrics</h2>
         <table>
         <thead>
           <tr>
@@ -397,11 +406,11 @@ function App() {
 {showGraph && (
   <div className="graphs-container">
     <div className="stock-graph">
-      <h3>{tickers.split(',').length === 1 ? 'Stock Chart' : 'Combined Stock Chart'}</h3>
+      <h3>{tickers.split(',').length === 5 ? 'Stock Chart' : 'Combined Stock Chart'}</h3>
       <canvas
         id="combinedStockGraph"
-        width="3500"   // Adjusted width for a bigger chart
-        height="3000"  // Adjusted height for a bigger chart
+        width="5500"   // Adjusted width for a bigger chart
+        height="5000"  // Adjusted height for a bigger chart
       ></canvas>
     </div>
   </div>
