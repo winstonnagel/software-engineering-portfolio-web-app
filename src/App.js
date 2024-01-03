@@ -16,23 +16,13 @@ function App() {
 
   const chartRef = useRef(null);
   const [showGraph, setShowGraph] = useState(false);
-  const chartTitle = tickers.split(',').length === 1 ? 'Stock Chart' : 'Combined Stock Chart';
   const [spMetrics, setSpMetrics] = useState(null);
   const [dowMetrics, setDowMetrics] = useState(null);
   const [nasdaqMetrics, setNasdaqMetrics] = useState(null);
   const [russellMetrics, setRussellMetrics] = useState(null);
-
-  const [tickerError, setTickerError] = useState(null);
   const [legendFontSize, setLegendFontSize] = useState(30); // Default font size set to 14
   const [showDefinitions, setShowDefinitions] = useState(false);
   const [handlelogin, sethandlelogin] = useState(false);
-  const [showHome, setshowhome] = useState(false);
-
-
-
-
-
-
 
 
   const colors = [
@@ -103,7 +93,7 @@ function App() {
 
       chartRef.current = combinedChart;
     }
-  }, [stockData, showGraph, spMetrics]);
+  }, [stockData, showGraph, spMetrics, legendFontSize, colors]);
 
 
 
@@ -148,11 +138,7 @@ function App() {
       console.warn(`No valid data found for key: ${key}`);
       return "N/A"; // Return a placeholder if there's no valid data
     }
-    const averagemaxChangePercent = computeAverage(stockMetrics.map(stock => parseFloat(stock.metrics.maxChangePercent)));
-    const averageYear5ChangePercent = computeAverage(stockMetrics.map(stock => parseFloat(stock.metrics.year5ChangePercent)));
-    const averageYear1ChangePercent = computeAverage(stockMetrics.map(stock => parseFloat(stock.metrics.year1ChangePercent)));
-    const averageMonth6ChangePercent = computeAverage(stockMetrics.map(stock => parseFloat(stock.metrics.month6ChangePercent)));
-    const averageDay5ChangePercent = computeAverage(stockMetrics.map(stock => parseFloat(stock.metrics.day5ChangePercent)));
+
 
 
 
