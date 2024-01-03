@@ -1,0 +1,61 @@
+.login-container {
+  text-align: center;
+  padding: 50px;
+}
+
+.login-header, .login-subheader {
+  margin-bottom: 20px;
+}
+
+.plan-container {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 30px;
+}
+
+
+.plan-box {
+  flex: 1; /* Allow the box to grow and shrink based on content */
+  padding: 15px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 0.8em; /* Adjust the font-size */
+  line-height: 1; /* Set line-height to ensure tight vertical spacing */
+}
+
+
+body .plan-box:hover, body .plan-box:active {
+  background-color: #90a17d; /* Change the background color to a lighter shade */
+  transition: background-color 0.3s ease; /* Smooth transition for color change */
+}
+
+body .plan-box.pro:hover, body .plan-box.pro:active {
+  background-color: #90a17d; /* Change the background color for Pro box */
+}
+
+.input-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.login-input {
+  margin-bottom: 30px;
+  padding: 20px;
+  width: 250px;
+  font-size: 20px;  /* Increased font size for the input */
+}
+
+.login-button {
+  padding: 40px 70px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 20px;  /* Increased font size for the button text */
+}
+
+.login-button:hover {
+  background-color: #0056b3;
+}

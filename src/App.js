@@ -5,6 +5,7 @@ import Chart from 'chart.js/auto';
 import axios from 'axios';
 import 'chartjs-adapter-date-fns';
 import FinanceDefinitions from './financedefinitions.js'; // Import the FinanceDefinitions component
+import Loginpage from './login.js'; // Import the Login component
 
 
 function App() {
@@ -17,8 +18,15 @@ function App() {
   const [showGraph, setShowGraph] = useState(false);
   const chartTitle = tickers.split(',').length === 1 ? 'Stock Chart' : 'Combined Stock Chart';
   const [spMetrics, setSpMetrics] = useState(null);
+  const [dowMetrics, setDowMetrics] = useState(null);
+  const [nasdaqMetrics, setNasdaqMetrics] = useState(null);
+  const [russellMetrics, setRussellMetrics] = useState(null);
+
   const [tickerError, setTickerError] = useState(null);
   const [legendFontSize, setLegendFontSize] = useState(30); // Default font size set to 14
+  const [showDefinitions, setShowDefinitions] = useState(false);
+  const [handlelogin, sethandlelogin] = useState(false);
+  const [showHome, setshowhome] = useState(false);
 
 
 
@@ -48,8 +56,8 @@ function App() {
 
     if (showGraph) {
       const ctx = document.getElementById('combinedStockGraph');
-      ctx.width = 1500;
-      ctx.height = 900;
+      ctx.width = 800;
+      ctx.height = 350;
 
       const datasets = stockData.map((stock, index) => ({
         label: stock.ticker || 'S&P 500',
@@ -58,6 +66,7 @@ function App() {
         borderWidth: 2,
         fill: false
       }));
+
 
 
 
@@ -96,7 +105,7 @@ function App() {
     }
   }, [stockData, showGraph, spMetrics]);
 
-  const [showDefinitions, setShowDefinitions] = useState(false);
+
 
 
 
@@ -111,10 +120,8 @@ function App() {
   const getBetaColor = (value) => {
     if (value < 0.6 || value > 1.5) {
       return { color: 'red' };
-    } else {
-    if (value > 0.6 || value < 1.4) {
+    } else if (value > 0.6 && value < 1.5) {
       return { color: 'rgb(0, 255, 44)' };
-      }
     }
     return {};
   };
@@ -146,6 +153,7 @@ function App() {
     const averageYear1ChangePercent = computeAverage(stockMetrics.map(stock => parseFloat(stock.metrics.year1ChangePercent)));
     const averageMonth6ChangePercent = computeAverage(stockMetrics.map(stock => parseFloat(stock.metrics.month6ChangePercent)));
     const averageDay5ChangePercent = computeAverage(stockMetrics.map(stock => parseFloat(stock.metrics.day5ChangePercent)));
+
 
 
     const averageValue = (validData.reduce((acc, val) => acc + parseFloat(val), 0) / validData.length).toFixed(2);
@@ -184,6 +192,8 @@ function App() {
         }
     });
 
+
+
     const fetchSp500Metrics = async () => {
       try {
           const response = await axios.get(`https://cloud.iexapis.com/stable/stock/SPY/advanced-stats?token=sk_399e63b2a3354cb0ba768c04cbe7ad92`);
@@ -195,6 +205,40 @@ function App() {
       }
   };
 
+    const fetchDowjonesMetrics = async () => {
+      try {
+          const response = await axios.get(`https://cloud.iexapis.com/stable/stock/DIA/advanced-stats?token=sk_399e63b2a3354cb0ba768c04cbe7ad92`);
+          return response.data;
+
+      } catch (error) {
+          console.error('Error fetching Dow Jones metrics:', error);
+          return null;
+      }
+  };
+
+    const fetchNasdaqMetrics = async () => {
+      try {
+          const response = await axios.get(`https://cloud.iexapis.com/stable/stock/QQQ/advanced-stats?token=sk_399e63b2a3354cb0ba768c04cbe7ad92`);
+          return response.data;
+
+      } catch (error) {
+          console.error('Error fetching Nasdaq metrics:', error);
+          return null;
+      }
+  };
+
+    const fetchRussellMetrics = async () => {
+      try {
+          const response = await axios.get(`https://cloud.iexapis.com/stable/stock/IWM/advanced-stats?token=sk_399e63b2a3354cb0ba768c04cbe7ad92`);
+          return response.data;
+
+      } catch (error) {
+          console.error('Error fetching Russell metrics:', error);
+          return null;
+      }
+  };
+
+
     const fetchMetricsPromises = tickerList.map(async (ticker) => {
         try {
           const response = await axios.get(`https://cloud.iexapis.com/stable/stock/${ticker}/advanced-stats?token=sk_399e63b2a3354cb0ba768c04cbe7ad92`);
@@ -204,9 +248,11 @@ function App() {
             const price52WeeksAgo = chartDataResponse.data[response.data.length - 52]?.close || 0;
             const epsValue = response.data.ttmEPS;
             const parsedEps = parseFloat(epsValue); // corrected parsing
+            const companyname = sectorResponse.data.companyName;
 
             return {
                 ticker,
+                companyname,
                 metrics: {
                     marketcap: parseFloat(response.data.marketcap).toFixed(2),
                     peRatio: parseFloat(response.data.peRatio).toFixed(2),
@@ -244,6 +290,18 @@ function App() {
 
     setStockData(fetchedData.filter(Boolean));
     setStockMetrics(fetchedMetrics.filter(Boolean));
+
+    const dowjonesData = await fetchDowjonesMetrics();
+    console.log("Dow Jones Data:", dowjonesData);
+    setDowMetrics(dowjonesData);
+
+    const nasdaqData = await fetchNasdaqMetrics();
+    console.log("Nasdaq Data:", nasdaqData);
+    setNasdaqMetrics(nasdaqData);
+
+    const russellData = await fetchRussellMetrics();
+    console.log("Russell Data:", russellData);
+    setRussellMetrics(russellData);
 };
 
 
@@ -259,17 +317,25 @@ function App() {
     fetchStockData(tickers);
     setShowLearnMore(true);
     setShowGraph(true);  // Set showGraph to true after fetching data
-
   };
   const handleLogin = () => {
-    // Logic for handling login
-    console.log('Login clicked');
-    setShowDefinitions(true);
-  };
-
-  const handleCloseDefinitions = () => {
-    setShowDefinitions(false);
+    console.log('Login Button clicked');
+    sethandlelogin(true); // Set handlelogin to true to show the Loginpage
+    setShowDefinitions(true); // Ensure that FinanceDefinitions is hidden
 };
+const handleCloseDefinitions = () => {
+  setShowDefinitions(false);
+  sethandlelogin(false);
+};
+
+
+
+const handleLearnAboutFinance = () => {
+  console.log('Learn About Finance Button clicked');
+  sethandlelogin(false); // Set handlelogin to false
+  setShowDefinitions(true); // Set showDefinitions to true to show the FinanceDefinitions
+};
+
 
   const averagemaxChangePercent = computeAverage(stockMetrics, 'maxChangePercent');
   const averageYear5ChangePercent = computeAverage(stockMetrics, 'year5ChangePercent');
@@ -285,24 +351,31 @@ function App() {
       <header className="App-header">
         <div className="header-content">
           <div className="header-buttons">
-          <button className="big-button" onClick={handleLogin}>Learn About Finance</button>
+          <button className="big-button" onClick={handleLearnAboutFinance}>Learn About Finance</button>
             <button className="big-button">Pricing</button>
             <button className="big-button">PortfolioPro</button>
-            <button className="big-button">Login</button>
+            <button className="big-button" onClick={handleLogin}>Login</button>
           </div>
           <img src={logo} className="App-logo" alt="logo" />
           <div className="header-input">
+    <div className="home-container">
+      <h2 className="home-header">Begin by entering stocks tickers below</h2>
+      <p className="home-subheader"></p>
+      <p className="home-subheader"></p>
+      <p className="home-subheader"></p>
+    </div>
             <input
               type="text"
-              placeholder="Enter tickers separated by commas"
+              placeholder="Enter tickers separated by commas. Example: AAPL for Apple"
               value={tickers}
               onChange={handleInputChange}
-              style={{ fontSize: '14px' }}
+              style={{ fontSize: '18px', textAlign: 'center' }}
             />
             <button type="submit" onClick={handleSubmit} style={{ fontSize: '1.5em', padding: '10px 20px' }}>Show stocks</button>
           </div>
         </div>
         {showDefinitions && <FinanceDefinitions onClose={handleCloseDefinitions} />}
+        {handlelogin && <Loginpage onClose={handleCloseDefinitions} />}
 
         {stockMetrics.length > 0 && (
     <div className="metrics-section">
@@ -311,10 +384,11 @@ function App() {
         <thead>
           <tr>
               <th>Ticker</th>
+              <th>Company Name</th>
               <th>Sector</th>
               <th>Market Cap</th>
               <th>PE Ratio</th>
-              <th>Beta</th>
+              <th>Beta(volatility, 1=market average)</th>
               <th>Dividend Yield</th>
               <th>EPS (TTM)</th>
               <th>Profit Margin</th>
@@ -335,6 +409,7 @@ function App() {
         <>
             <tr key={index} style={{ backgroundColor: 'transparent' }}>
                 <td>{stock.ticker}</td>
+                <td>{stock.companyname}</td>
                 <td>{stock.sector}</td>
                 <td>{formatMarketCap(stock.metrics.marketcap)}</td>
                 <td>{stock.metrics.peRatio}</td>
@@ -350,11 +425,12 @@ function App() {
                 <td style={{ color: getpercentageColor(stock.metrics.day5ChangePercent) }}>{stock.metrics.day5ChangePercent === "N/A" ? "N/A" : `${stock.metrics.day5ChangePercent}%`}</td>
 
                 </tr>
-            {index < stockMetrics.length - 1 && <tr className="separator-row"><td colSpan="14"></td></tr>}
+            {index < stockMetrics.length - 1 && <tr className="separator-row"><td colSpan="15"></td></tr>}
         </>
     ))}
 <tr className="average-row">
     <td>Averages</td>
+    <td>-</td>
     <td>-</td>
     <td>{formatMarketCap(parseFloat(computeAverage(stockMetrics, 'marketcap')))}</td>
     <td>{computeAverage(stockMetrics, 'peRatio')}</td>
@@ -371,9 +447,11 @@ function App() {
 
 
 </tr>
+
 {spMetrics && (
     <tr className="sp500-row">
         <td>S&P 500</td>
+        <td>-</td>
         <td>-</td>
         <td>-</td>
         <td>-</td>
@@ -391,6 +469,70 @@ function App() {
 
 </tr>
 )}
+{dowMetrics && (
+  <tr className="dowjones-row">
+      <td>Dow Jones</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td style={{ color: getpercentageColor(dowMetrics && dowMetrics.maxChangePercent) }}>{dowMetrics && dowMetrics.maxChangePercent ? `${(dowMetrics.maxChangePercent * 100).toFixed(2)}%` : "N/A"}</td>
+      <td style={{ color: getpercentageColor(dowMetrics && dowMetrics.year5ChangePercent) }}>{dowMetrics && dowMetrics.year5ChangePercent ? `${(dowMetrics.year5ChangePercent * 100).toFixed(2)}%` : "N/A"}</td>
+      <td style={{ color: getpercentageColor(dowMetrics && dowMetrics.year1ChangePercent) }}>{dowMetrics && dowMetrics.year1ChangePercent ? `${(dowMetrics.year1ChangePercent * 100).toFixed(2)}%` : "N/A"}</td>
+      <td style={{ color: getpercentageColor(dowMetrics && dowMetrics.month6ChangePercent) }}>{dowMetrics && dowMetrics.month6ChangePercent ? `${(dowMetrics.month6ChangePercent * 100).toFixed(2)}%` : "N/A"}</td>
+      <td style={{ color: getpercentageColor(dowMetrics && dowMetrics.day5ChangePercent) }}>{dowMetrics && dowMetrics.day5ChangePercent ? `${(dowMetrics.day5ChangePercent * 100).toFixed(2)}%` : "N/A"}</td>
+
+
+
+
+</tr>
+)}
+{nasdaqMetrics && (
+  <tr className="nasdaq-row">
+      <td>Nasdaq</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td style={{ color: getpercentageColor(nasdaqMetrics && nasdaqMetrics.maxChangePercent) }}>{nasdaqMetrics && nasdaqMetrics.maxChangePercent ? `${(nasdaqMetrics.maxChangePercent * 100).toFixed(2)}%` : "N/A"}</td>
+      <td style={{ color: getpercentageColor(nasdaqMetrics && nasdaqMetrics.year5ChangePercent) }}>{nasdaqMetrics && nasdaqMetrics.year5ChangePercent ? `${(nasdaqMetrics.year5ChangePercent * 100).toFixed(2)}%` : "N/A"}</td>
+      <td style={{ color: getpercentageColor(nasdaqMetrics && nasdaqMetrics.year1ChangePercent) }}>{nasdaqMetrics && nasdaqMetrics.year1ChangePercent ? `${(nasdaqMetrics.year1ChangePercent * 100).toFixed(2)}%` : "N/A"}</td>
+      <td style={{ color: getpercentageColor(nasdaqMetrics && nasdaqMetrics.month6ChangePercent) }}>{nasdaqMetrics && nasdaqMetrics.month6ChangePercent ? `${(nasdaqMetrics.month6ChangePercent * 100).toFixed(2)}%` : "N/A"}</td>
+      <td style={{ color: getpercentageColor(nasdaqMetrics && nasdaqMetrics.day5ChangePercent) }}>{nasdaqMetrics && nasdaqMetrics.day5ChangePercent ? `${(nasdaqMetrics.day5ChangePercent * 100).toFixed(2)}%` : "N/A"}</td>
+
+</tr>
+)}
+{russellMetrics && (
+  <tr className="russell-row">
+    <td>Russell</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td style={{ color: getpercentageColor(russellMetrics && russellMetrics.maxChangePercent) }}>{russellMetrics && russellMetrics.maxChangePercent ? `${(russellMetrics.maxChangePercent * 100).toFixed(2)}%` : "N/A"}</td>
+      <td style={{ color: getpercentageColor(russellMetrics && russellMetrics.year5ChangePercent) }}>{russellMetrics && russellMetrics.year5ChangePercent ? `${(russellMetrics.year5ChangePercent * 100).toFixed(2)}%` : "N/A"}</td>
+      <td style={{ color: getpercentageColor(russellMetrics && russellMetrics.year1ChangePercent) }}>{russellMetrics && russellMetrics.year1ChangePercent ? `${(russellMetrics.year1ChangePercent * 100).toFixed(2)}%` : "N/A"}</td>
+      <td style={{ color: getpercentageColor(russellMetrics && russellMetrics.month6ChangePercent) }}>{russellMetrics && russellMetrics.month6ChangePercent ? `${(russellMetrics.month6ChangePercent * 100).toFixed(2)}%` : "N/A"}</td>
+      <td style={{ color: getpercentageColor(russellMetrics && russellMetrics.day5ChangePercent) }}>{russellMetrics && russellMetrics.day5ChangePercent ? `${(russellMetrics.day5ChangePercent * 100).toFixed(2)}%` : "N/A"}</td>
+
+</tr>
+
+)}
 </tbody>
 </table>
 </div>
@@ -398,7 +540,7 @@ function App() {
 
 {showLearnMore && (
         <li style={{ listStyleType: 'none', fontSize: '1.5em', marginTop: '20px' }}>
-          To learn more about the financial metrics above, please click the<span style={{ textDecoration: 'underline', fontWeight: 'bold' }}>Learn About Finance</span> Button.
+          To learn more about the financial metrics above, please click the <span style={{ textDecoration: 'underline', fontWeight: 'bold' }}>Learn About Finance</span> Button.
         </li>
       )}
 
@@ -406,11 +548,11 @@ function App() {
 {showGraph && (
   <div className="graphs-container">
     <div className="stock-graph">
-      <h3>{tickers.split(',').length === 5 ? 'Stock Chart' : 'Combined Stock Chart'}</h3>
+      <h3>{tickers.split(',').length === 1 ? 'Stock Chart' : 'Combined Stock Chart'}</h3>
       <canvas
         id="combinedStockGraph"
-        width="5500"   // Adjusted width for a bigger chart
-        height="5000"  // Adjusted height for a bigger chart
+        width="100"   // Adjusted width for a bigger chart
+        height="600"  // Adjusted height for a bigger chart
       ></canvas>
     </div>
   </div>

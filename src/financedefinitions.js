@@ -5,7 +5,6 @@ import './financedefinitions.css'; // Assuming you have a separate CSS file
 const FinanceDefinitions = ({ onClose }) => {
   return (
     <div className="definitions-modal">
-    <button onClick={onClose} style={{ fontSize: '1.5em', padding: '10px 20px', display: 'block', margin: 'auto' }}>Close and return to my portoflio page</button>
     <h2 style={{ textAlign: 'center' }}>Finance 101</h2>
     <ul className="definitions-list">
                 <li><strong style = {{textDecoration:'underline'}}>Ticker:</strong> This is the stock symbol of a company. For example, GS is the ticker for Goldman Sachs.</li>
@@ -13,7 +12,7 @@ const FinanceDefinitions = ({ onClose }) => {
                 <li><strong style = {{textDecoration:'underline'}}>Market Cap:</strong> This represents the total value of all a company's shares of stock.</li>
                 <li><strong style = {{textDecoration:'underline'}} >PE Ratio:</strong> This represents te share price divided by the earnings per share.</li>
                 <li><strong style = {{textDecoration:'underline'}}>Beta: </strong> This represents a measure of market risk. The base Beta is 1.
-                This means that if a stock has a beta of 2 and the market goes up by 10%, that stock will go up 20%. Same with other values.
+                This means that if a stock has a beta of 2 and the market goes up by 10%, that this stock will go up 20%. Same with other values.
                 If a stock has a beta of 0.8 and a stock goes up 10%, then this stock will go up only 8%.
                 Furethermore, a stock with a beta of -1 will go up if stock goes down. For example, if the market goes down 10%, this stock will go up 10%.</li>
                 <li><strong style = {{textDecoration:'underline'}}>Dividend Yield:</strong> This represents the dividend per share divided by the share price.
@@ -26,6 +25,7 @@ const FinanceDefinitions = ({ onClose }) => {
                 <li><strong style = {{textDecoration:'underline'}}>Profit Margin:</strong> This represents the profit of a company divided by the revenue.
                 For example, if a company has a profit of $100 and has a revenue of $1000, the profit margin is 10%.</li>
             </ul>
+            <button onClick={onClose} style={{ fontSize: '1.5em', padding: '10px 20px', display: 'block', margin: 'auto' }}>Close and return to my portoflio page</button>
         </div>
     );
 }

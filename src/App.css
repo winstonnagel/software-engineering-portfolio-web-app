@@ -33,7 +33,7 @@ body, html {
 
 .header-input input[type="text"] {
   width: 100%; /* Adjust width as needed */
-  padding: 12px 20px; /* Increase padding for better spacing */
+  padding: 10px 18px; /* Increase padding for better spacing */
   margin: 8px 0; /* Adjust margin for better spacing */
   font-size: 20px; /* Increase font size for better visibility */
   box-sizing: border-box; /* Ensure padding and border are included in the total width */
@@ -96,12 +96,13 @@ form {
 }
 
 .graph-wrapper {
-  width: calc(100% - 40px); /* Adjust based on the width and gap */
+  width: calc(10% - 40px); /* Adjust based on the width and gap */
   box-sizing: border-box;
   padding: 10px;
   border: 1px solid #ccc;
   text-align: center;
   font-size: 5.5em;
+  width: 40%;
 }
 
 .graph-wrapper canvas {
@@ -111,12 +112,11 @@ form {
 }
 
 .graph-wrapper .ticker-class {
-  font-size: 5.5em; /* Adjust font size for tickers */
+  font-size: 5.5em;
 }
 
-/* Alternatively, if you want to target the tickers that appear above the chart more precisely */
 .graph-wrapper .ticker-above {
-  font-size: 5.5em; /* Adjust font size for these specific tickers */
+  font-size: 5.5em;
 }
 
 .average-row {
@@ -126,6 +126,24 @@ form {
 }
 
 .sp500-row {
+  background-color: white;
+  color: black;
+  font-weight: bold;
+}
+
+.dowjones-row {
+  background-color: white;
+  color: black;
+  font-weight: bold;
+}
+
+.nasdaq-row {
+  background-color: white;
+  color: black;
+  font-weight: bold;
+}
+
+.russell-row {
   background-color: white;
   color: black;
   font-weight: bold;
