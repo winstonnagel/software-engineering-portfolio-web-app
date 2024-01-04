@@ -15,22 +15,22 @@
 
 
 .plan-box {
-  flex: 1; /* Allow the box to grow and shrink based on content */
+  flex: 1;
   padding: 15px;
   border: 1px solid #ccc;
   border-radius: 5px;
-  font-size: 0.8em; /* Adjust the font-size */
-  line-height: 1; /* Set line-height to ensure tight vertical spacing */
+  font-size: 0.8em;
+  line-height: 1;
 }
 
 
 body .plan-box:hover, body .plan-box:active {
-  background-color: #90a17d; /* Change the background color to a lighter shade */
-  transition: background-color 0.3s ease; /* Smooth transition for color change */
+  background-color: #90a17d;
+  transition: background-color 0.3s ease;
 }
 
 body .plan-box.pro:hover, body .plan-box.pro:active {
-  background-color: #90a17d; /* Change the background color for Pro box */
+  background-color: #90a17d;
 }
 
 .input-container {
@@ -43,7 +43,7 @@ body .plan-box.pro:hover, body .plan-box.pro:active {
   margin-bottom: 30px;
   padding: 20px;
   width: 250px;
-  font-size: 20px;  /* Increased font size for the input */
+  font-size: 20px;
 }
 
 .login-button {
@@ -53,9 +53,28 @@ body .plan-box.pro:hover, body .plan-box.pro:active {
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  font-size: 20px;  /* Increased font size for the button text */
+  font-size: 20px;
 }
 
 .login-button:hover {
   background-color: #0056b3;
+}
+
+
+.checkbox-container {
+  margin-top: 10px;
+  margin-bottom: 30px;
+
+}
+
+#emailNotifications {
+  width: 125px;
+  height: 125px;
+  transform: scale(1.5);
+  margin-right: 10px;
+}
+
+label[for="emailNotifications"] {
+
+  font-size: 1.2em;
 }

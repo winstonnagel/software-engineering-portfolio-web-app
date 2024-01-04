@@ -1,7 +1,7 @@
 import React from 'react';
-import './financedefinitions.css'; // Assuming you have a separate CSS file
+import './financedefinitions.css';
 
-
+// code for the finance definitions page
 const FinanceDefinitions = ({ onClose }) => {
   return (
     <div className="definitions-modal">

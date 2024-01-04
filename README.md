@@ -1,6 +1,7 @@
-# Getting Started with Create React App
-
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# Being able to webscrape the data
+The user must input their own private token on lines 166, 186, 197, 208, 219, 231, 232, 233.
+To get a token, they must creare an account on (https://iexcloud.io/)
+then follow the steps below
 
 ## Available Scripts
 

@@ -9,7 +9,7 @@
 
 svg {
   display: block;
-  margin-bottom: 10px; /* Adjust as necessary */
+  margin-bottom: 10px;
 }
 
 body, html {
@@ -22,7 +22,6 @@ body, html {
   padding: 0;
 }
 
-
 .header-content {
   display: flex;
   flex-direction: column;
@@ -32,13 +31,13 @@ body, html {
 }
 
 .header-input input[type="text"] {
-  width: 100%; /* Adjust width as needed */
-  padding: 10px 18px; /* Increase padding for better spacing */
-  margin: 8px 0; /* Adjust margin for better spacing */
-  font-size: 20px; /* Increase font size for better visibility */
-  box-sizing: border-box; /* Ensure padding and border are included in the total width */
-  margin-bottom: 10px; /* Add space between the input and the button */
-  margin-top: 1px; /* Adjusted value to bring the input box closer to the logo */
+  width: 100%;
+  padding: 10px 18px;
+  margin: 8px 0;
+  font-size: 20px;
+  box-sizing: border-box;
+  margin-bottom: 10px;
+  margin-top: 1px;
 }
 
 .header-buttons {
@@ -58,10 +57,10 @@ body, html {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-start; /* Change from center to flex-start */
+  justify-content: flex-start;
   font-size: calc(10px + 1.5vmin);
   color: white;
-  padding-top: 20px; /* Reduce the padding for the logo */
+  padding-top: 20px;
   padding-bottom: 20px;
 }
 
@@ -73,7 +72,7 @@ body, html {
 }
 
 form {
-  margin-top: 20px; /* Create space between the logo and the input box */
+  margin-top: 20px;
 }
 
 .App-link {
@@ -84,19 +83,19 @@ form {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 20px; /* Adjust the gap between graphs */
+  gap: 20px;
 }
 
 .App-logo-container {
-  width: 800px;  /* Adjust as needed */
-  height: 500px; /* Adjust as needed */
+  width: 800px;
+  height: 500px;
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
 .graph-wrapper {
-  width: calc(10% - 40px); /* Adjust based on the width and gap */
+  width: calc(10% - 40px);
   box-sizing: border-box;
   padding: 10px;
   border: 1px solid #ccc;
@@ -150,5 +149,5 @@ form {
 }
 
 .separator-row td {
-  border-bottom: 1px solid white; /* This will create a line below each table cell */
+  border-bottom: 1px solid white;
 }

@@ -4,8 +4,10 @@ import './App.css';
 import Chart from 'chart.js/auto';
 import axios from 'axios';
 import 'chartjs-adapter-date-fns';
-import FinanceDefinitions from './financedefinitions.js'; // Import the FinanceDefinitions component
-import Loginpage from './login.js'; // Import the Login component
+import FinanceDefinitions from './financedefinitions.js';
+import Loginpage from './login.js';
+import { Home } from './Home.js';
+
 
 
 function App() {
@@ -20,11 +22,12 @@ function App() {
   const [dowMetrics, setDowMetrics] = useState(null);
   const [nasdaqMetrics, setNasdaqMetrics] = useState(null);
   const [russellMetrics, setRussellMetrics] = useState(null);
-  const [legendFontSize, setLegendFontSize] = useState(30); // Default font size set to 14
+  const [legendFontSize, setLegendFontSize] = useState(30);
   const [showDefinitions, setShowDefinitions] = useState(false);
   const [handlelogin, sethandlelogin] = useState(false);
 
 
+  // this adds colours to the stock chart
   const colors = [
     'rgba(75, 192, 192, 1)',
     'rgba(255, 99, 132, 1)',
@@ -60,7 +63,7 @@ function App() {
 
 
 
-
+      // Add the S&P 500 data to the datasets
       const combinedChart = new Chart(ctx, {
         type: 'line',
         data: {
@@ -98,7 +101,7 @@ function App() {
 
 
 
-
+  // this formats the market cap and revenue to billions
   const formatValue = (value) => {
     if (value < 1e9) {
       return `$${(value / 1e9).toFixed(1)}B`;
@@ -106,7 +109,7 @@ function App() {
       return `$${(value / 1e9).toFixed(0)}B`;
     }
   };
-
+  // this changes the beta color based on its value
   const getBetaColor = (value) => {
     if (value < 0.6 || value > 1.5) {
       return { color: 'red' };
@@ -115,7 +118,7 @@ function App() {
     }
     return {};
   };
-
+  // this changes the percentage color based on its value
   const getpercentageColor = (value) => {
     if (value < 0) {
       return 'red';
@@ -131,38 +134,36 @@ function App() {
   const formatMarketCap = (marketcap) => formatValue(marketcap);
   const formatRevenue = (revenue) => formatValue(revenue);
 
+  // this computes the average of the financial metrics by checking if the data is valid
   const computeAverage = (data, key) => {
     const validData = data.filter(stock => stock.metrics && !isNaN(stock.metrics[key]) && stock.metrics[key] !== null && stock.metrics[key] !== undefined).map(stock => stock.metrics[key]);
 
     if (validData.length === 0) {
       console.warn(`No valid data found for key: ${key}`);
-      return "N/A"; // Return a placeholder if there's no valid data
+      return "N/A";
     }
-
-
-
 
     const averageValue = (validData.reduce((acc, val) => acc + parseFloat(val), 0) / validData.length).toFixed(2);
 
     // Check if the key is 'dividendYield' and format the value as a percentage
     if (key === 'dividendYield') {
-      return `${averageValue}%`; // Return the average with a percentage symbol
+      return `${averageValue}%`;
     } else {
-      return averageValue; // Return the average value as it is
+      return averageValue;
     }
   };
 
 
 
 
-
+  // this fetches the stock data from the API
   const fetchStockData = async (tickers, years) => {
 
     const tickerList = tickers.split(',').map(ticker => ticker.trim());
 
     const fetchDataPromises = tickerList.map(async (ticker) => {
         try {
-            const response = await axios.get(`https://cloud.iexapis.com/stable/stock/${ticker}/chart/1y?range=10y&token=sk_399e63b2a3354cb0ba768c04cbe7ad92`);
+            const response = await axios.get(`https://cloud.iexapis.com/stable/stock/${ticker}/chart/1y?range=10y&token=ADD_IEX_CLOUD_TOKEN_HERE`);
             const dataSinceStartDate = response.data.map(data => ({
                 date: data.date,
                 close: data.close
@@ -179,10 +180,10 @@ function App() {
     });
 
 
-
+    // this fetches the S&P500 financial metrics from the API
     const fetchSp500Metrics = async () => {
       try {
-          const response = await axios.get(`https://cloud.iexapis.com/stable/stock/SPY/advanced-stats?token=sk_399e63b2a3354cb0ba768c04cbe7ad92`);
+          const response = await axios.get(`https://cloud.iexapis.com/stable/stock/SPY/advanced-stats?token=ADD_IEX_CLOUD_TOKEN_HERE`);
           return response.data;
 
       } catch (error) {
@@ -190,10 +191,10 @@ function App() {
           return null;
       }
   };
-
+    // this fetches the Dow Jones financial metrics from the API
     const fetchDowjonesMetrics = async () => {
       try {
-          const response = await axios.get(`https://cloud.iexapis.com/stable/stock/DIA/advanced-stats?token=sk_399e63b2a3354cb0ba768c04cbe7ad92`);
+          const response = await axios.get(`https://cloud.iexapis.com/stable/stock/DIA/advanced-stats?token=ADD_IEX_CLOUD_TOKEN_HERE`);
           return response.data;
 
       } catch (error) {
@@ -201,10 +202,10 @@ function App() {
           return null;
       }
   };
-
+    // this fetches the Nasdaq financial metrics from the API
     const fetchNasdaqMetrics = async () => {
       try {
-          const response = await axios.get(`https://cloud.iexapis.com/stable/stock/QQQ/advanced-stats?token=sk_399e63b2a3354cb0ba768c04cbe7ad92`);
+          const response = await axios.get(`https://cloud.iexapis.com/stable/stock/QQQ/advanced-stats?token=ADD_IEX_CLOUD_TOKEN_HERE`);
           return response.data;
 
       } catch (error) {
@@ -212,10 +213,10 @@ function App() {
           return null;
       }
   };
-
+    // this fetches the Russell financial metrics from the API
     const fetchRussellMetrics = async () => {
       try {
-          const response = await axios.get(`https://cloud.iexapis.com/stable/stock/IWM/advanced-stats?token=sk_399e63b2a3354cb0ba768c04cbe7ad92`);
+          const response = await axios.get(`https://cloud.iexapis.com/stable/stock/IWM/advanced-stats?token=ADD_IEX_CLOUD_TOKEN_HERE`);
           return response.data;
 
       } catch (error) {
@@ -224,18 +225,19 @@ function App() {
       }
   };
 
-
+    // this fetches the stock metrics from the API
     const fetchMetricsPromises = tickerList.map(async (ticker) => {
         try {
-          const response = await axios.get(`https://cloud.iexapis.com/stable/stock/${ticker}/advanced-stats?token=sk_399e63b2a3354cb0ba768c04cbe7ad92`);
-          const sectorResponse = await axios.get(`https://cloud.iexapis.com/stable/stock/${ticker}/company?token=sk_399e63b2a3354cb0ba768c04cbe7ad92`);
-            const chartDataResponse = await axios.get(`https://cloud.iexapis.com/stable/stock/${ticker}/chart/1y?token=sk_399e63b2a3354cb0ba768c04cbe7ad92`);
+          const response = await axios.get(`https://cloud.iexapis.com/stable/stock/${ticker}/advanced-stats?token=ADD_IEX_CLOUD_TOKEN_HERE`);
+          const sectorResponse = await axios.get(`https://cloud.iexapis.com/stable/stock/${ticker}/company?token=ADD_IEX_CLOUD_TOKEN_HERE`);
+            const chartDataResponse = await axios.get(`https://cloud.iexapis.com/stable/stock/${ticker}/chart/1y?token=ADD_IEX_CLOUD_TOKEN_HERE`);
 
             const price52WeeksAgo = chartDataResponse.data[response.data.length - 52]?.close || 0;
             const epsValue = response.data.ttmEPS;
             const parsedEps = parseFloat(epsValue); // corrected parsing
             const companyname = sectorResponse.data.companyName;
 
+            // this returns the stock metrics
             return {
                 ticker,
                 companyname,
@@ -269,7 +271,7 @@ function App() {
     const fetchedData = await Promise.all(fetchDataPromises);
     const fetchedMetrics = await Promise.all(fetchMetricsPromises);
 
-    // Assuming fetchSp500Metrics is a function that fetches and returns the S&P 500 metrics
+    // this returns the S&P500 metrics
     const sp500Data = await fetchSp500Metrics();
     console.log("S&P 500 Data:", sp500Data);
     setSpMetrics(sp500Data);
@@ -277,52 +279,60 @@ function App() {
     setStockData(fetchedData.filter(Boolean));
     setStockMetrics(fetchedMetrics.filter(Boolean));
 
+    // this returns the Dow Jones metrics
     const dowjonesData = await fetchDowjonesMetrics();
     console.log("Dow Jones Data:", dowjonesData);
     setDowMetrics(dowjonesData);
 
+    // this returns the Nasdaq metrics
     const nasdaqData = await fetchNasdaqMetrics();
     console.log("Nasdaq Data:", nasdaqData);
     setNasdaqMetrics(nasdaqData);
 
+    // this returns the Russell metrics
     const russellData = await fetchRussellMetrics();
     console.log("Russell Data:", russellData);
     setRussellMetrics(russellData);
 };
 
-
+  // this handles the input change and sets the tickers to uppercase
   const handleInputChange = (event) => {
     setTickers(event.target.value.toUpperCase());
-    const inputFontSize = 40; // Set the desired font size for the legend
+    const inputFontSize = 40;
     setLegendFontSize(inputFontSize);
     setError('');
   };
 
+  // this handles the submit button and fetches the stock data
   const handleSubmit = (event) => {
     event.preventDefault();
     fetchStockData(tickers);
     setShowLearnMore(true);
-    setShowGraph(true);  // Set showGraph to true after fetching data
+    setShowGraph(true);
+
   };
+
   const handleLogin = () => {
     console.log('Login Button clicked');
-    sethandlelogin(true); // Set handlelogin to true to show the Loginpage
-    setShowDefinitions(true); // Ensure that FinanceDefinitions is hidden
+    sethandlelogin(true);
+    setShowDefinitions(false);
 };
+
+// this closes the finance definitions page
 const handleCloseDefinitions = () => {
   setShowDefinitions(false);
   sethandlelogin(false);
 };
 
 
-
+// this closes the login page
 const handleLearnAboutFinance = () => {
   console.log('Learn About Finance Button clicked');
   sethandlelogin(false); // Set handlelogin to false
   setShowDefinitions(true); // Set showDefinitions to true to show the FinanceDefinitions
 };
 
-
+  // this gets the average of the percentage changes
   const averagemaxChangePercent = computeAverage(stockMetrics, 'maxChangePercent');
   const averageYear5ChangePercent = computeAverage(stockMetrics, 'year5ChangePercent');
   const averageYear1ChangePercent = computeAverage(stockMetrics, 'year1ChangePercent');
@@ -331,18 +341,19 @@ const handleLearnAboutFinance = () => {
 
 
 
-
+// this handles the tabs
   return (
     <div className="App">
       <header className="App-header">
         <div className="header-content">
           <div className="header-buttons">
           <button className="big-button" onClick={handleLearnAboutFinance}>Learn About Finance</button>
-            <button className="big-button">Pricing</button>
-            <button className="big-button">PortfolioPro</button>
             <button className="big-button" onClick={handleLogin}>Login</button>
           </div>
           <img src={logo} className="App-logo" alt="logo" />
+          {Home && <Home onClose={handleCloseDefinitions} />}
+
+          {/* this is the input box */}
           <div className="header-input">
     <div className="home-container">
       <h2 className="home-header">Begin by entering stocks tickers below</h2>
@@ -363,6 +374,7 @@ const handleLearnAboutFinance = () => {
         {showDefinitions && <FinanceDefinitions onClose={handleCloseDefinitions} />}
         {handlelogin && <Loginpage onClose={handleCloseDefinitions} />}
 
+        {/* this creates the table */}
         {stockMetrics.length > 0 && (
     <div className="metrics-section">
         <h2>Your Portfolio's Financial Metrics</h2>
@@ -392,6 +404,7 @@ const handleLearnAboutFinance = () => {
       <tbody>
     {stockMetrics.map((stock, index) => (
 
+        // this creates the table rows and shows the metrics for each stock
         <>
             <tr key={index} style={{ backgroundColor: 'transparent' }}>
                 <td>{stock.ticker}</td>
@@ -414,6 +427,7 @@ const handleLearnAboutFinance = () => {
             {index < stockMetrics.length - 1 && <tr className="separator-row"><td colSpan="15"></td></tr>}
         </>
     ))}
+    {/* this creates the average row */}
 <tr className="average-row">
     <td>Averages</td>
     <td>-</td>
@@ -434,6 +448,7 @@ const handleLearnAboutFinance = () => {
 
 </tr>
 
+{/* this creates the S&P500 row */}
 {spMetrics && (
     <tr className="sp500-row">
         <td>S&P 500</td>
@@ -455,6 +470,7 @@ const handleLearnAboutFinance = () => {
 
 </tr>
 )}
+{/* this creates the Dow Jones row */}
 {dowMetrics && (
   <tr className="dowjones-row">
       <td>Dow Jones</td>
@@ -478,6 +494,7 @@ const handleLearnAboutFinance = () => {
 
 </tr>
 )}
+{/* this creates the Nasdaq row */}
 {nasdaqMetrics && (
   <tr className="nasdaq-row">
       <td>Nasdaq</td>
@@ -498,6 +515,7 @@ const handleLearnAboutFinance = () => {
 
 </tr>
 )}
+{/* this creates the Russell row */}
 {russellMetrics && (
   <tr className="russell-row">
     <td>Russell</td>
@@ -530,7 +548,7 @@ const handleLearnAboutFinance = () => {
         </li>
       )}
 
-
+{/* this shows the graph */}
 {showGraph && (
   <div className="graphs-container">
     <div className="stock-graph">
