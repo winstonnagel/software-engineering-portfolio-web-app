@@ -127,6 +127,12 @@ function App() {
     }
     return 'inherit';
   }
+  const handleSavePortfolio = () => {
+    const portfolioName = document.getElementById('portfolioName').value;
+    // You can add further logic here, such as saving the portfolio name to a database or state
+    console.log(`Portfolio name is: ${portfolioName}`);
+  };
+
 
   const [showLearnMore, setShowLearnMore] = useState(false);
 
@@ -154,8 +160,6 @@ function App() {
   };
 
 
-
-
   // this fetches the stock data from the API
   const fetchStockData = async (tickers, years) => {
 
@@ -163,7 +167,7 @@ function App() {
 
     const fetchDataPromises = tickerList.map(async (ticker) => {
         try {
-            const response = await axios.get(`https://cloud.iexapis.com/stable/stock/${ticker}/chart/1y?range=10y&token=ADD_IEX_CLOUD_TOKEN_HERE`);
+            const response = await axios.get(`https://cloud.iexapis.com/stable/stock/${ticker}/chart/1y?range=10y&token=ADD_IEX_CLOUD_API_TOKEN_HERE`);
             const dataSinceStartDate = response.data.map(data => ({
                 date: data.date,
                 close: data.close
@@ -183,7 +187,7 @@ function App() {
     // this fetches the S&P500 financial metrics from the API
     const fetchSp500Metrics = async () => {
       try {
-          const response = await axios.get(`https://cloud.iexapis.com/stable/stock/SPY/advanced-stats?token=ADD_IEX_CLOUD_TOKEN_HERE`);
+          const response = await axios.get(`https://cloud.iexapis.com/stable/stock/SPY/advanced-stats?token=ADD_IEX_CLOUD_API_TOKEN_HERE`);
           return response.data;
 
       } catch (error) {
@@ -194,7 +198,7 @@ function App() {
     // this fetches the Dow Jones financial metrics from the API
     const fetchDowjonesMetrics = async () => {
       try {
-          const response = await axios.get(`https://cloud.iexapis.com/stable/stock/DIA/advanced-stats?token=ADD_IEX_CLOUD_TOKEN_HERE`);
+          const response = await axios.get(`https://cloud.iexapis.com/stable/stock/DIA/advanced-stats?token=ADD_IEX_CLOUD_API_TOKEN_HERE`);
           return response.data;
 
       } catch (error) {
@@ -205,7 +209,7 @@ function App() {
     // this fetches the Nasdaq financial metrics from the API
     const fetchNasdaqMetrics = async () => {
       try {
-          const response = await axios.get(`https://cloud.iexapis.com/stable/stock/QQQ/advanced-stats?token=ADD_IEX_CLOUD_TOKEN_HERE`);
+          const response = await axios.get(`https://cloud.iexapis.com/stable/stock/QQQ/advanced-stats?token=ADD_IEX_CLOUD_API_TOKEN_HERE`);
           return response.data;
 
       } catch (error) {
@@ -216,7 +220,7 @@ function App() {
     // this fetches the Russell financial metrics from the API
     const fetchRussellMetrics = async () => {
       try {
-          const response = await axios.get(`https://cloud.iexapis.com/stable/stock/IWM/advanced-stats?token=ADD_IEX_CLOUD_TOKEN_HERE`);
+          const response = await axios.get(`https://cloud.iexapis.com/stable/stock/IWM/advanced-stats?token=ADD_IEX_CLOUD_API_TOKEN_HERE`);
           return response.data;
 
       } catch (error) {
@@ -228,9 +232,9 @@ function App() {
     // this fetches the stock metrics from the API
     const fetchMetricsPromises = tickerList.map(async (ticker) => {
         try {
-          const response = await axios.get(`https://cloud.iexapis.com/stable/stock/${ticker}/advanced-stats?token=ADD_IEX_CLOUD_TOKEN_HERE`);
-          const sectorResponse = await axios.get(`https://cloud.iexapis.com/stable/stock/${ticker}/company?token=ADD_IEX_CLOUD_TOKEN_HERE`);
-            const chartDataResponse = await axios.get(`https://cloud.iexapis.com/stable/stock/${ticker}/chart/1y?token=ADD_IEX_CLOUD_TOKEN_HERE`);
+          const response = await axios.get(`https://cloud.iexapis.com/stable/stock/${ticker}/advanced-stats?token=ADD_IEX_CLOUD_API_TOKEN_HERE`);
+          const sectorResponse = await axios.get(`https://cloud.iexapis.com/stable/stock/${ticker}/company?token=ADD_IEX_CLOUD_API_TOKEN_HERE`);
+            const chartDataResponse = await axios.get(`https://cloud.iexapis.com/stable/stock/${ticker}/chart/1y?token=ADD_IEX_CLOUD_API_TOKEN_HERE`);
 
             const price52WeeksAgo = chartDataResponse.data[response.data.length - 52]?.close || 0;
             const epsValue = response.data.ttmEPS;
@@ -368,7 +372,7 @@ const handleLearnAboutFinance = () => {
               onChange={handleInputChange}
               style={{ fontSize: '18px', textAlign: 'center' }}
             />
-            <button type="submit" onClick={handleSubmit} style={{ fontSize: '1.5em', padding: '10px 20px' }}>Show stocks</button>
+            <button type="submit" onClick={handleSubmit} style={{ fontSize: '1.45em', padding: '10px 20px' }}>Show stocks</button>
           </div>
         </div>
         {showDefinitions && <FinanceDefinitions onClose={handleCloseDefinitions} />}
@@ -377,7 +381,7 @@ const handleLearnAboutFinance = () => {
         {/* this creates the table */}
         {stockMetrics.length > 0 && (
     <div className="metrics-section">
-        <h2>Your Portfolio's Financial Metrics</h2>
+        <h3>Your Portfolio's Financial Metrics</h3>
         <table>
         <thead>
           <tr>
@@ -543,10 +547,21 @@ const handleLearnAboutFinance = () => {
         )}
 
 {showLearnMore && (
-        <li style={{ listStyleType: 'none', fontSize: '1.5em', marginTop: '20px' }}>
+        <li style={{ listStyleType: 'none', fontSize: '1.3em', marginTop: '20px' }}>
           To learn more about the financial metrics above, please click the <span style={{ textDecoration: 'underline', fontWeight: 'bold' }}>Learn About Finance</span> Button.
         </li>
       )}
+{/* Add input box to name and save the portfolio */}
+<div className="portfolio-input">
+  <label htmlFor="portfolioName">Name your portfolio: </label>
+  <input
+    type="text"
+    id="portfolioName"
+    placeholder="Enter portfolio name"
+    /* Add any other necessary attributes or event handlers */
+  />
+  <button onClick={handleSavePortfolio}>Save</button> {/* Assuming you have a handler function named handleSavePortfolio */}
+</div>
 
 {/* this shows the graph */}
 {showGraph && (
